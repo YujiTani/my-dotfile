@@ -7,26 +7,28 @@ return {
   config = function()
     require("mason-lspconfig").setup({
       ensure_installed = {
-        "lua_ls",  -- Lua言語サーバー
+        "lua_ls",
         -- 他に必要な言語サーバーをここに追加
       },
       automatic_installation = true,
     })
 
-    -- LSPサーバーの基本設定
-    local on_attach = function(client, bufnr)
-      vim.keymap.set("n", "gd", vim.lsp.buf.definition, { buffer = bufnr, desc = "Go to Definition" })
-      vim.keymap.set("n", "K", vim.lsp.buf.hover, { buffer = bufnr, desc = "Show Hover" })
-      -- 他のキーマップはここに追加
-    end
+    local lsp_utils = require("plugins.lsp.utils")
 
-    -- 自動設定
+
     require("mason-lspconfig").setup_handlers({
       function(server_name)
-        require("lspconfig")[server_name].setup({
-          on_attach = on_attach,
-        })
+        local has_custom_config, server_config = pcall(require, "plugins.lsp.servers." .. server_name)
+        local config = {
+          on_attach = lsp_utils.on_attach,
+        }
+        if has_custom_config then
+          for k, v in pairs(server_config) do
+            config[k] = v
+          end
+        end
+        require("lspconfig")[server_name].setup(config)
       end,
     })
-  end
+ end
 }

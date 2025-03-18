@@ -11,11 +11,11 @@ return {
     "javascriptreact",
   },
   opts = {
-    auto_open = true,         -- エラー発生時に自動的にウィンドウを開く
-    enabled = true,           -- プラグインを有効化
+    auto_open = true,
+    enabled = true,
     keymaps = {
-      toggle = "<leader>dd",  -- エラー表示のトグル
-      go_to_definition = "gd" -- エラー定義にジャンプ
+      toggle = "<leader>dd",
+      go_to_definition = "gd"
     }
   }
 }
