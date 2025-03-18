@@ -7,9 +7,8 @@ return {
 	view_options = {
 		show_hidden = true,
 	},
-	-- ファイルシステムの変更を監視してOilをリロードするにはtrueに設定
-  	watch_for_changes = false,
-	delete_to_trash = true,
+  	watch_for_changes = true,
+        delete_to_trash = true,
   },
   lazy = false,
 }

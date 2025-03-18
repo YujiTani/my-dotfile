@@ -1,24 +1,31 @@
 local M = {}
 
 M.on_attach = function(client, bufnr)
-  vim.keymap.set("n", "gd", vim.lsp.buf.definition, { buffer = bufnr, desc = "Go to Definition" })
-  vim.keymap.set("n", "K", vim.lsp.buf.hover, { buffer = bufnr, desc = "Show Hover" })
-  
-
 	if client.supports_method("textDocument/formatting") then
-		vim.api.nvim_create_automd("ButWritePre", {
+		vim.api.nvim_create_autocmd({ "BufWritePre" }, {
 			buffer = bufnr,
 			callback = function()
-				vim.lsp.format({ bufnr = bufnr })
+				vim.lsp.buf.format({
+					timeout_ms = 3000,
+				})
 			end,
 		})
 	end
 end
 
--- 初期化
-M.setup = function()
-  M.setup_diagnostics()
+M.setup_diagnostics = function()
+	vim.diagnostic.config({
+		virtual_text = true,
+		signs = true,
+		underline = true,
+		update_in_insert = false,
+		severity_sort = true,
+	})
 end
 
+-- 初期化
+M.setup = function()
+	M.setup_diagnostics()
+end
 
 return M
