@@ -19,10 +19,6 @@ return {
 				width = 0.9,
 			},
 		})
-		vim.keymap.set('n', '<leader>g', function()
-			lazygit:toggle()
-		end, { desc = 'Toggle lazygit' })
 		vim.api.nvim_create_user_command('FTermToggle', fterm.toggle, { bang = true })
-		vim.api.nvim_create_user_command('Lazygit', function() lazygit:toggle() end, { bang = true })
 	end,
 }
