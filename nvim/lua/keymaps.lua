@@ -15,3 +15,6 @@ vim.keymap.set('n', '<leader>ff', require('telescope.builtin').find_files, { des
 vim.keymap.set('n', '<leader>fg', require('telescope.builtin').live_grep, { desc = 'テキスト検索' })
 vim.keymap.set('n', '<leader>fb', require('telescope.builtin').buffers, { desc = 'Buffers' })
 vim.keymap.set('n', '<leader>fh', require('telescope.builtin').help_tags, { desc = 'Help Tags' })
+
+-- copilotのキーマップ
+vim.keymap.set('n', '<leader>ct', '<CMD>Copilot toggle<CR>', { desc = 'toggle Copilot' })

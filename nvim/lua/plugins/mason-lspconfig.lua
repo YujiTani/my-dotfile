@@ -35,6 +35,7 @@ return {
 
       vim.keymap.set("n", "gd", vim.lsp.buf.definition, { buffer = bufnr, desc = "Go to Definition" })
       vim.keymap.set("n", "K", vim.lsp.buf.hover, { buffer = bufnr, desc = "Show Hover" })
+      vim.keymap.set("n", "gb", "<C-o>", { buffer = bufnr, desc = "Go Back" })
     end
 
     local function setup_diagnostics()
