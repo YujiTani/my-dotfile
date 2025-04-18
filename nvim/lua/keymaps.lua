@@ -18,3 +18,8 @@ vim.keymap.set('n', '<leader>fh', require('telescope.builtin').help_tags, { desc
 
 -- copilotのキーマップ
 vim.keymap.set('n', '<leader>ct', '<CMD>Copilot toggle<CR>', { desc = 'toggle Copilot' })
+
+-- カーソル位置の診断情報を浮動ウィンドウで表示
+vim.keymap.set('n', '<leader>d', vim.diagnostic.open_float, { desc = '診断情報を表示' })
+vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = '次の診断へ' }) -- 次の診断位置へ移動
+vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = '前の診断へ' }) -- 前の診断位置へ移動

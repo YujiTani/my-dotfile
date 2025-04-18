@@ -2,25 +2,38 @@ return {
 	"folke/which-key.nvim",
 	event = "VeryLazy",
 	opts = {
-		-- your configuration comes here
-		-- or leave it empty to use the default settings
-		-- refer to the configuration section below
-		spec = {
-			{
-				mode = { "n", "v" },
-				["<leader>f"] = { name = "ファイル/検索" }, -- telescope, oil関連
-				["<leader>g"] = { name = "Git" }, -- gitsigns, lazygit関連
-				["<leader>l"] = { name = "LSP" }, -- lsp関連の操作
+		plugins = {
+			marks = true,
+			registers = true,
+			spelling = { enabled = false },
+			presets = {
+				operators = true,
+				motions = true,
+				text_objects = true,
+				windows = true,
+				nav = true,
+				z = true,
+				g = true,
 			},
 		},
-	},
-	keys = {
-		{
-			"<leader>?",
-			function()
-				require("which-key").show({ global = false })
-			end,
-			desc = "Buffer Local Keymaps (which-key)",
+		window = {
+			border = "rounded",
+			padding = { 2, 2, 2, 2 },
 		},
 	},
+	config = function(_, opts)
+		local wk = require("which-key")
+		wk.setup(opts)
+
+		-- 新しい形式でグループを登録
+		wk.register({
+			f = { name = "ファイル/検索", _ = "which_key_ignore" },
+			g = { name = "Git", _ = "which_key_ignore" },
+			l = { name = "LSP", _ = "which_key_ignore" },
+		}, { prefix = "<leader>" })
+	end,
+	keys = {
+		{ "<leader>?", function() require("which-key").show({ global = false }) end, desc = "Buffer Local Keymaps" },
+	},
 }
+

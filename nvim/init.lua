@@ -1,10 +1,27 @@
-require("config.lazy")
+require("lazy_setup")
 require('keymaps')
 
--- init.lua または init.vim 内に追加
+-- 診断表示の設定
+-- LSP（言語サーバープロトコル）からの診断情報（エラー、警告など）の表示方法を設定
 vim.diagnostic.config({
-  virtual_text = true, -- インラインのエラーメッセージを非表示
-  signs = true,        -- 行番号の横のアイコンは表示したままにする場合
-  underline = true,    -- エラー箇所の下線は表示したままにする場合
+  virtual_text = true,
+  signs = true,
+  underline = false,
   update_in_insert = false,
+
+-- 代替方法として浮動ウィンドウに表示
+  float = {
+    show_header = true,
+    source = 'always',
+    border = 'rounded',
+    format = function(diagnostic)
+      return string.format(
+        "%s (%s) [%s]",
+        diagnostic.message,
+        diagnostic.source,
+        diagnostic.code or diagnostic.user_data.lsp.code
+      )
+    end,
+    }
 })
+
