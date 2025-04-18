@@ -5,9 +5,8 @@
 ## 構造
 
 - `init.lua` - メインのエントリーポイント（設定の読み込み）
-- `lua/config/lazy.lua` - プラグインマネージャーのセットアップ
+- `lua/lazy_setup.lua` - プラグインマネージャーのセットアップ
 - `lua/keymaps.lua` - カスタムキーバインド
-- `lua/options.lua` - Neovim オプション
 - `lua/plugins/` - プラグイン設定
 
 ## 機能
@@ -20,10 +19,15 @@
   - ファイル管理のための Oil.nvim
 - **Git 統合**: Lazygit と Gitsigns を使用
 - **UI 強化**: 
-  - Tokyo Night カラースキーム
+  - Catppuccin カラースキーム
   - より良い構文ハイライトのための Treesitter
   - lualine によるカスタムステータスライン
-  - 様々な視覚的改善（hlchunk, scrollbar など）
+  - 様々な視覚的改善（hlchunk, hlslens, scrollbar など）
+- **コード補助**:
+  - better-ts-errors による TypeScript エラー表示の改善
+  - null-ls による追加のコード分析と整形
+  - comment.nvim によるコメント操作
+  - fterm による組み込みターミナル
 
 ## キーマッピング
 
@@ -34,13 +38,25 @@
 - `<leader>fh` - ヘルプタグ
 - `<leader>o` - Oil ファイルエクスプローラーを開く
 - `<leader>y` - クリップボードにコピー
-- `<leader>d` - クリップボードにカット
+- `<leader>p` - クリップボードから貼り付け
+- `<leader>d` - 診断情報の表示（LSP）
+- `<leader>ct` - Copilot のトグル
 - `gd` - 定義へジャンプ（LSP）
+- `gr` - 参照を表示（LSP）
 - `K` - ホバー情報を表示（LSP）
+- `<leader>ca` - コードアクション（LSP）
+- `[d` / `]d` - 診断間の移動（LSP）
 
 ## LSP 設定
 
-この設定には Mason を通じた言語サーバーの自動インストールと設定が含まれています。また、言語サーバーがサポートしている場合は保存時の自動フォーマットも設定されています。
+この設定には Mason を通じた言語サーバーの自動インストールと設定が含まれています。以下の言語サーバーが設定されています：
+
+- TypeScript (typescript-language-server)
+- ESLint
+- Lua (lua-language-server)
+- Ruby (solargraph)
+
+また、LSPSaga を使用したUIの改善や、保存時の自動フォーマットも設定されています。
 
 ## インストール
 
