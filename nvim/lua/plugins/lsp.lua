@@ -1,6 +1,5 @@
 -- lua/plugins/lsp.lua
 -- LSP関連の設定
-
 return {
   -- LSPサーバーのインストールと管理
   {
@@ -30,9 +29,9 @@ return {
       require("mason-lspconfig").setup({
         ensure_installed = {
           "typescript", -- TypeScript
-          "eslint",     -- ESLint
+          "eslint", -- ESLint
           "solargraph", -- Ruby
-          "lua_ls",     -- Lua
+          "lua_ls", -- Lua
         },
         automatic_installation = true,
       })
