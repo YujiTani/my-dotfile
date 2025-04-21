@@ -28,7 +28,7 @@ return {
     config = function()
       require("mason-lspconfig").setup({
         ensure_installed = {
-          "typescript", -- TypeScript
+          "ts_ls", -- TypeScript
           "eslint", -- ESLint
           "solargraph", -- Ruby
           "lua_ls", -- Lua
@@ -52,7 +52,7 @@ return {
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
       -- TypeScript
-      lspconfig.typescript.setup({
+      lspconfig.ts_ls.setup({
         capabilities = capabilities,
         settings = {
           typescript = {
