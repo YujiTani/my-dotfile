@@ -46,3 +46,48 @@ vim.diagnostic.config({
     end,
   },
 })
+
+-- リロード用のグローバル関数を定義
+_G.ReloadModule = function(module_name)
+  package.loaded[module_name] = nil
+  return require(module_name)
+end
+
+-- コマンドを作成
+vim.api.nvim_create_user_command("R", function(opts)
+  if opts.args == "" then
+    vim.cmd("source $MYVIMRC")
+    print("Reloaded MYVIMRC")
+  else
+    ReloadModule(opts.args)
+    print("Reloaded " .. opts.args)
+  end
+end, { nargs = "?" })
+
+-- 特定のファイルタイプに対する自動リロード
+vim.api.nvim_create_autocmd("BufWritePost", {
+  pattern = "*/nvim/lua/**/*.lua",
+  callback = function(args)
+    local file = vim.fn.fnamemodify(args.file, ":p:.")
+    local module = file:gsub("%.lua$", ""):gsub("/", "."):gsub("lua%.", "")
+    if package.loaded[module] then
+      package.loaded[module] = nil
+      require(module)
+      print("Auto-reloaded " .. module)
+    end
+  end,
+})
+
+vim.keymap.set("n", "<leader>rr", function()
+  vim.cmd("w")
+  local file = vim.fn.expand("%:p:.")
+  local module = file:gsub("%.lua$", ""):gsub("/", "."):gsub("lua%.", "")
+  if package.loaded[module] then
+    package.loaded[module] = nil
+    require(module)
+    print("Reloaded " .. module)
+  else
+    vim.cmd("source %")
+    print("Sourced " .. file)
+  end
+end, { desc = "Save and reload current file" })
