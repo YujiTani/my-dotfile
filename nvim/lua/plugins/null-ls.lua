@@ -12,9 +12,12 @@ return {
         -- Lua
         null_ls.builtins.formatting.stylua.with({
           extra_args = {
-            "--indent-type", "Spaces",
-            "--indent-width", "2",
-            "--quote-style", "AutoPreferDouble",
+            "--indent-type",
+            "Spaces",
+            "--indent-width",
+            "2",
+            "--quote-style",
+            "AutoPreferDouble",
           },
         }),
 

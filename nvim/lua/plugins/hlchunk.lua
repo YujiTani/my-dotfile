@@ -13,7 +13,7 @@ return {
           "*.json",
           "*.lua",
           "*.py",
-          "*.*", 
+          "*.*",
         },
         chars = {
           horizontal_line = "─",
@@ -37,7 +37,7 @@ return {
       line_num = {
         enable = true,
         support_filetypes = {
-          "*.*"
+          "*.*",
         },
         style = {
           fg = "#2d79c7",
@@ -56,4 +56,3 @@ return {
     })
   end,
 }
-
