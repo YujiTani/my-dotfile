@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(nvim:*)",
+      "Bash(timeout 10 nvim:*)"
+    ],
+    "deny": []
+  }
+}
