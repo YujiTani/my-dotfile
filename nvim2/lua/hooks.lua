@@ -1,4 +1,6 @@
 -- help検索コマンド :h autocmd-events
+
+-- file移動ショートカット
 vim.api.nvim_create_user_command(
         'InitLua',
         function()
@@ -8,7 +10,7 @@ vim.api.nvim_create_user_command(
 )
 
 vim.api.nvim_create_user_command(
-  'Keyconf',
+  'Keymapconf',
   function()
     vim.cmd.edit(vim.fn.stdpath('config') .. '/lua/keymaps.lua')
   end,
@@ -21,6 +23,14 @@ vim.api.nvim_create_user_command(
     vim.cmd.edit(vim.fn.stdpath('config') .. '/lua/hooks.lua')
   end,
   { desc = 'Open hooks.lua' }
+)
+
+vim.api.nvim_create_user_command(
+  'Optionsconf',
+  function()
+    vim.cmd.edit(vim.fn.stdpath('config') .. '/lua/options.lua')
+  end,
+  { desc = 'Open options.lua' }
 )
 
 
