@@ -1,0 +1,19 @@
+vim.opt.number = true
+vim.opt.cursorline = true
+vim.opt.cursorcolumn = true
+vim.opt.wrap = true -- 改行する
+vim.opt.linebreak = true -- 単語境界で改行
+vim.opt.showmatch = true  -- 対応括弧をハイライト
+vim.opt.hlsearch = true  -- 検索結果ハイライト
+vim.opt.expandtab = true
+vim.opt.tabstop = 3
+vim.opt.shiftwidth = 2
+vim.opt.scrolloff = 3
+vim.opt.whichwrap = 'b,s,h,l,<,>,[,],~'
+vim.opt.autoindent = true
+vim.opt.autowrite = true  -- 自動保存
+vim.opt.autoread = true  -- ファイル変更時自動読み込み
+vim.opt.wildmenu = true  -- コマンドライン補完メニュー
+vim.opt.ttyfast = true  -- 高速ターミナル
+vim.opt.termguicolors = true  -- 24bit色対応
+vim.opt.clipboard:append('unnamedplus,unnamed')
