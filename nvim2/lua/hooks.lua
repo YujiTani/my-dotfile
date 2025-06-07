@@ -57,3 +57,25 @@ create_autocmd('BufWritePre', {
   end,
   desc = 'Auto mkdir to save file'
 })
+
+-- require('mini.statusline').setup()と同じlaterの中に追加
+create_autocmd({ 'RecordingEnter', 'CmdlineEnter' }, {
+  pattern = '*',
+  callback = function()
+    vim.opt.cmdheight = 1
+  end,
+})
+create_autocmd('RecordingLeave', {
+  pattern = '*',
+  callback = function()
+    vim.opt.cmdheight = 0
+  end,
+})
+create_autocmd('CmdlineLeave', {
+  pattern = '*',
+  callback = function()
+    if vim.fn.reg_recording() == '' then
+      vim.opt.cmdheight = 0
+    end
+  end,
+})

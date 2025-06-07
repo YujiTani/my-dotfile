@@ -34,3 +34,29 @@ require('mini.basics').setup({
   silent = false,
 })
 
+-- helpの日本語化プラグイン
+later(function()
+  add('https://github.com/vim-jp/vimdoc-ja')
+  vim.opt.helplang:prepend('ja')
+end)
+
+-- ステータスラインを表示するプラグイン
+now(function()
+  require('mini.statusline').setup()
+  vim.opt.laststatus = 3
+  vim.opt.cmdheight = 0
+end)
+
+-- カーソル位置が保存するプラグイン
+now(function()
+  require('mini.misc').setup()
+  MiniMisc.setup_restore_cursor()
+end)
+
+-- 通知を変更するプラグイン
+now(function()
+  require('mini.notify').setup()
+  vim.notify = require('mini.notify').make_notify({
+    ERROR = { duration = 10000 }
+  })
+end)
