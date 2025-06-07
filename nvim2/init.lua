@@ -79,3 +79,13 @@ end)
 now(function()
   require('mini.starter').setup()
 end)
+
+-- 括弧・クォート編集支援系
+later(function()
+  require('mini.pairs').setup()
+end)
+
+--括弧変換
+later(function()
+  require('mini.surround').setup()
+end)
