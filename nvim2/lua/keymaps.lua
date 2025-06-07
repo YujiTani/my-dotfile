@@ -10,3 +10,6 @@ vim.keymap.set(
   end,
   { desc = 'Quit current tab or window' }
 )
+
+-- 検索結果をクリア
+vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
