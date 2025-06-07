@@ -2,6 +2,7 @@ require('mini/mini')
 require("options")
 require("hooks")
 require("keymaps")
+require("theme")
 
 -- ou et up 'mini.deps' (customize to your liking)
 require('mini.deps').setup({ path = { package = path_package } })
@@ -59,4 +60,22 @@ now(function()
   vim.notify = require('mini.notify').make_notify({
     ERROR = { duration = 10000 }
   })
+end)
+
+-- 視認性向上
+later(function()
+  require('mini.cursorword').setup()
+end)
+
+later(function()
+  require('mini.indentscope').setup()
+end)
+
+later(function()
+  require('mini.trailspace').setup()
+end)
+
+-- startMenuプラグイン
+now(function()
+  require('mini.starter').setup()
 end)
