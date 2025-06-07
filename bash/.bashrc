@@ -19,6 +19,13 @@ export HISTFILESIZE=20000
 export HISTCONTROL=ignoredups:erasedups
 export HISTTIMEFORMAT='%Y-%m-%d %H:%M:%S '
 
+# 便利な関数
+mkcd() {
+    mkdir -p "$1" && cd "$1"
+}
+
+eval "$(starship init bash)"
+
 # 基本エイリアス
 alias ll='ls -la'
 alias l='ls -CF'
@@ -49,8 +56,3 @@ alias dclf='docker compose logs -f'
 # 開発用エイリアス
 alias nv='nvim'
 alias vc='code'
-
-# 便利な関数
-mkcd() {
-    mkdir -p "$1" && cd "$1"
-}
