@@ -376,12 +376,12 @@ later(function()
       hide_during_completion = true,
       debounce = 75,
       keymap = {
-        accept = "<M-l>",
-        accept_word = "<M-w>",
-        accept_line = "<M-j>",
-        next = "<M-]>",
-        prev = "<M-[>",
-        dismiss = "<C-]>",
+        accept = "<Tab>",
+        accept_word = "<S-Tab>",
+        accept_line = "<C-j>",
+        next = "<C-n>",
+        prev = "<C-p>",
+        dismiss = "<Esc>",
       },
     },
     panel = { enabled = false },
@@ -403,5 +403,23 @@ later(function()
 
   local hl = vim.api.nvim_get_hl(0, { name = 'Comment' })
   vim.api.nvim_set_hl(0, 'CopilotSuggestion', vim.tbl_extend('force', hl, { underline = true }))
+end)
+
+-- nvim-treesitter
+later(function()
+  add({
+    source = 'https://github.com/nvim-treesitter/nvim-treesitter',
+    hooks = {
+      post_checkout = function()
+        vim.cmd.TSUpdate()
+      end
+    },
+  })
+  ---@diagnostic disable-next-line: missing-fields
+  require('nvim-treesitter.configs').setup({
+    -- auto-install parsers
+    ensure_installed = { 'lua', 'vim', 'tsx' },
+    highlight = { enable = true },
+  })
 end)
 
