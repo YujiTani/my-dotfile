@@ -380,4 +380,18 @@ vim.api.nvim_create_user_command('SessionReveal', function()
   vim.print(vim.fn.fnamemodify(vim.v.this_session, ':t:r'))
 end, { desc = 'Reveal session' })
 
+-- Gitの変更を可視化
+later(function()
+  require('mini.diff').setup({
+    view = {
+      signs = { add = '+', change = '~', delete = '-' },
+    },
+  })
+end)
 
+-- Gitコマンド拡張
+later(function()
+  require('mini.git').setup()
+
+  vim.keymap.set({ 'n', 'x' }, '<leader>gs', MiniGit.show_at_cursor, { desc = 'Show at cursor' })
+end)
