@@ -3,11 +3,13 @@ require("options")
 require("hooks")
 require("keymaps")
 require("theme")
-require("lsp")
 
 -- ou et up 'mini.deps' (customize to your liking)
 require('mini.deps').setup({ path = { package = path_package } })
 local add, now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
+
+add('neovim/nvim-lspconfig')
+require("lsp")
 
 -- leaderキー
 vim.g.mapleader = ","

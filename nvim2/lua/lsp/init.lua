@@ -1,44 +1,25 @@
--- lua/lsp/init.lua
-vim.api.nvim_create_user_command(
-  'LspHealth',
-  'checkhealth vim.lsp',
-  { desc = 'LSP health check' })
+local dirname = vim.fn.stdpath('config') .. '/lua/lsp'
 
-vim.diagnostic.config({
-  virtual_text = true
-})
+-- 設定したlspを保存する配列
+local lsp_names = {}
 
-local augroup = vim.api.nvim_create_augroup('lsp/init.lua', {})
-
-vim.api.nvim_create_autocmd('LspAttach', {
-  group = augroup,
-  callback = function(args)
-    local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
-
-    if client:supports_method('textDocument/definition') then
-      -- 定義ジャンプの設定（省略）
+-- 同一ディレクトリのファイルをループ
+for file, ftype in vim.fs.dir(dirname) do
+  -- `.lua`で終わるファイルを処理（init.luaは除く）
+  if ftype == 'file' and vim.endswith(file, '.lua') and file ~= 'init.lua' then
+    -- 拡張子を除いてlsp名を作る
+    local lsp_name = file:sub(1, -5) -- fname without '.lua'
+    -- 読み込む
+    local ok, result = pcall(require, 'lsp.' .. lsp_name)
+    if ok then
+      -- 読み込めた場合はlspを設定
+      vim.lsp.config(lsp_name, result)
+      table.insert(lsp_names, lsp_name)
+    else
+      -- 読み込めなかった場合はエラーを表示
+      vim.notify('Error loading LSP: ' .. lsp_name .. '\n' .. result, vim.log.levels.WARN)
     end
+  end
+end
 
-    if client:supports_method('textDocument/formatting') then
-      -- フォーマットの設定（省略）
-    end
-
-    vim.keymap.set('n', 'grd', function()
-      vim.lsp.buf.definition()
-    end, { buffer = args.buf, desc = 'vim.lsp.buf.definition()' })
-
-    vim.keymap.set('n', '<leader>i', function()
-      vim.lsp.buf.format({ bufnr = args.buf, id = client.id })
-    end, { buffer = args.buf, desc = 'Format buffer' })
-  end,
-})
-
-vim.lsp.config('*', {
-  root_markers = { '.git' },
-  capabilities = require('mini.completion').get_lsp_capabilities(),
-})
-
--- 設定オブジェクトを取得して適用
-local lua_ls_opts = require('lsp.lua_ls')
-vim.lsp.config('lua_ls', lua_ls_opts)
-vim.lsp.enable('lua_ls')
+vim.lsp.enable(lsp_names)
