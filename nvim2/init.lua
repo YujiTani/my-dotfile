@@ -381,15 +381,47 @@ vim.api.nvim_create_user_command('SessionReveal', function()
 end, { desc = 'Reveal session' })
 
 
--- ========================================
 -- Git関連の設定（mini.diff + mini.git）
--- ========================================
 now(function()
   require('mini.diff').setup({
     view = {
       style = 'sign',
       signs = { add = '+', change = '~', delete = '-' },
     },
+  })
+end)
+
+-- オペレーターの追加
+later(function()
+  require('mini.operators').setup({
+    replace = { prefix = 'R' },
+    exchange = { prefix = '/' },
+  })
+
+  vim.keymap.set('n', 'RR', 'R', { desc = 'Replace mode' })
+end)
+
+-- デフォルトのf tによる移動を強化
+later(function()
+  require('mini.jump').setup({
+    delay = {
+      idle_stop = 10,
+    },
+  })
+end)
+
+-- ページスクロールを滑らかに変更
+later(function()
+  local animate = require('mini.animate')
+  animate.setup({
+    cursor = {
+      -- Animate for 100 milliseconds with linear easing
+      timing = animate.gen_timing.linear({ duration = 100, unit = 'total' }),
+    },
+    scroll = {
+      -- Animate for 150 milliseconds with linear easing
+      timing = animate.gen_timing.linear({ duration = 150, unit = 'total' }),
+    }
   })
 end)
 
