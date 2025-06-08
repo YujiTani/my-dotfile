@@ -13,6 +13,9 @@ export PATH="/usr/local/opt/mysql/bin:$PATH"
 export PATH="$HOME/.composer/vendor/bin:$PATH"
 export PATH="$HOME/.nodebrew/current/bin:$PATH"
 
+# Go関連
+export PATH="$HOME/go/bin:$PATH"
+
 # npm関連（重複を整理）
 export PATH="$HOME/.npm-global/bin:$PATH"
 
