@@ -151,29 +151,15 @@ later(function()
   })
 end)
 
--- lsp
+-- LSP
 now(function()
   vim.diagnostic.config({
     virtual_text = true
   })
-
-  create_autocmd('LspAttach', {
-    callback = function(args)
-      local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
-
-      vim.keymap.set('n', 'grd', function()
-        vim.lsp.buf.definition()
-      end, { buffer = args.buf, desc = 'vim.lsp.buf.definition()' })
-
-      vim.keymap.set('n', '<space>i', function()
-        vim.lsp.buf.format({ bufnr = args.buf, id = client.id })
-      end, { buffer = args.buf, desc = 'Format buffer' })
-    end,
-  })
-
   vim.lsp.config('*', {
     root_markers = { '.git' },
   })
+
   vim.lsp.config('lua_ls', {
     cmd = { 'lua-language-server' },
     filetypes = { 'lua' },
@@ -189,15 +175,154 @@ now(function()
         workspace = {
           checkThirdParty = false,
           library = vim.list_extend(vim.api.nvim_get_runtime_file('lua', true), {
-            '${3rd}/luv/library',
-            '${3rd}/busted/library',
+            "${3rd}/luv/library",
+            "${3rd}/busted/library",
           }),
         }
       })
     end,
     settings = {
-      Lua = {}
+      Lua = {
+        diagnostics = {
+          -- 未使用変数は冒頭に`_`をつけていれば警告なし
+          unusedLocalExclude = { '_*' }
+        }
+      }
     }
   })
+
   vim.lsp.enable('lua_ls')
+  create_autocmd('LspAttach', {
+    callback = function(args)
+      local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
+
+      vim.keymap.set('n', 'grd', function()
+        vim.lsp.buf.definition()
+      end, { buffer = args.buf, desc = 'vim.lsp.buf.definition()' })
+
+      vim.keymap.set('n', '<leader>i', function()
+        vim.lsp.buf.format({ bufnr = args.buf, id = client.id })
+      end, { buffer = args.buf, desc = 'Format buffer' })
+    end,
+  })
+end)
+
+-- 自動補完のプラグイン
+later(function()
+  require('mini.fuzzy').setup()
+  require('mini.completion').setup({
+    lsp_completion = {
+      process_items = MiniFuzzy.process_lsp_items,
+    },
+  })
+  require('mini.snippets').setup({
+    mappings = {
+      jump_prev = '<c-k>',
+    },
+  })
+
+  -- improve fallback completion
+  vim.opt.complete = { '.', 'w', 'k', 'b', 'u' }
+  vim.opt.completeopt:append('fuzzy')
+  vim.opt.dictionary:append('/usr/share/dict/words') -- 注意1
+
+  -- define keycodes
+  local keys = {
+    cn = vim.keycode('<c-n>'),
+    cp = vim.keycode('<c-p>'),
+    ct = vim.keycode('<c-t>'),
+    cd = vim.keycode('<c-d>'),
+    cr = vim.keycode('<cr>'),
+    cy = vim.keycode('<c-y>'),
+  }
+
+  -- select by <tab>/<s-tab>
+  vim.keymap.set('i', '<tab>', function()
+    -- popup is visible -> next item
+    -- popup is NOT visible -> add indent
+    return vim.fn.pumvisible() == 1 and keys.cn or keys.ct
+  end, { expr = true, desc = 'Select next item if popup is visible' })
+  vim.keymap.set('i', '<s-tab>', function()
+    -- popup is visible -> previous item
+    -- popup is NOT visible -> remove indent
+    return vim.fn.pumvisible() == 1 and keys.cp or keys.cd
+  end, { expr = true, desc = 'Select previous item if popup is visible' })
+
+  -- complete by <cr>
+  vim.keymap.set('i', '<cr>', function()
+    if vim.fn.pumvisible() == 0 then
+      -- popup is NOT visible -> insert newline
+      return require('mini.pairs').cr() -- 注意2
+    end
+    local item_selected = vim.fn.complete_info()['selected'] ~= -1
+    if item_selected then
+      -- popup is visible and item is selected -> complete item
+      return keys.cy
+    end
+    -- popup is visible but item is NOT selected -> hide popup and insert newline
+    return keys.cy .. keys.cr
+  end, { expr = true, desc = 'Complete current item if item is selected' })
+end)
+
+-- バッファ支援
+later(function()
+  require('mini.tabline').setup()
+end)
+
+-- バッファを削除する関数
+later(function()
+  require('mini.bufremove').setup()
+
+  vim.api.nvim_create_user_command(
+    'Bufdelete',
+    function()
+      MiniBufremove.delete()
+    end,
+    { desc = 'Remove buffer' }
+  )
+end)
+
+-- ファイラープラグイン
+now(function()
+  require('mini.files').setup()
+
+  vim.api.nvim_create_user_command(
+    'Files',
+    function()
+      MiniFiles.open()
+    end,
+    { desc = 'Open file exproler' }
+  )
+end)
+
+-- Fuzzy Finderモジュール
+later(function()
+  require('mini.pick').setup()
+
+  vim.ui.select = MiniPick.ui_select
+
+  -- ファイルピッカーを開く
+  vim.keymap.set('n', '<leader>f', function()
+    MiniPick.builtin.files({ tool = 'git' })
+  end, { desc = 'mini.pick.files' })
+  -- バッファ選択・削除機能（Space+b）
+  vim.keymap.set('n', '<leader>b', function()
+    local wipeout_cur = function()
+      vim.api.nvim_buf_delete(MiniPick.get_picker_matches().current.bufnr, {})
+    end
+    local buffer_mappings = { wipeout = { char = '<c-d>', func = wipeout_cur } }
+    MiniPick.builtin.buffers({ include_current = false }, { mappings = buffer_mappings })
+  end, { desc = 'mini.pick.buffers' })
+  -- 訪問履歴機能（Space+h）
+  require('mini.visits').setup()
+  vim.keymap.set('n', '<leader>h', function()
+    require('mini.extra').pickers.visit_paths()
+  end, { desc = 'mini.extra.visit_paths' })
+  -- ヘルプファインダー
+  vim.keymap.set('c', 'h', function()
+    if vim.fn.getcmdtype() .. vim.fn.getcmdline() == ':h' then
+      return '<c-u>Pick help<cr>'
+    end
+    return 'h'
+  end, { expr = true, desc = 'mini.pick.help' })
 end)
