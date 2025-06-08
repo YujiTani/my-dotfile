@@ -36,7 +36,7 @@ vim.api.nvim_create_user_command(
 
 local augroup = vim.api.nvim_create_augroup('init.lua', {})
 
-local function create_autocmd(event, opts)
+function create_autocmd(event, opts)
   vim.api.nvim_create_autocmd(event, vim.tbl_extend('force', {
     group = augroup,
   },
