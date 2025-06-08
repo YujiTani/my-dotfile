@@ -347,3 +347,61 @@ later(function()
   })
 end)
 
+-- nvim-tree-sitter
+later(function()
+  add({
+    source = 'https://github.com/nvim-treesitter/nvim-treesitter',
+    hooks = {
+      post_checkout = function()
+        vim.cmd.TSUpdate()
+      end
+    },
+  })
+  ---@diagnostic disable-next-line: missing-fields
+  require('nvim-treesitter.configs').setup({
+    -- auto-install parsers
+    ensure_installed = { 'lua', 'vim', 'tsx' },
+    highlight = { enable = true },
+  })
+end)
+
+-- Copilot設定
+later(function()
+  add({ source = 'https://github.com/zbirenbaum/copilot.lua' })
+
+  require('copilot').setup({
+    suggestion = {
+      enabled = true,
+      auto_trigger = true,
+      hide_during_completion = true,
+      debounce = 75,
+      keymap = {
+        accept = "<M-l>",
+        accept_word = "<M-w>",
+        accept_line = "<M-j>",
+        next = "<M-]>",
+        prev = "<M-[>",
+        dismiss = "<C-]>",
+      },
+    },
+    panel = { enabled = false },
+    filetypes = {
+      markdown = true,
+      gitcommit = true,
+      help = true,
+      lua = true,
+      ['*'] = function()
+        -- disable for files with specific names
+        local fname = vim.fs.basename(vim.api.nvim_buf_get_name(0))
+        local disable_patterns = { 'env', 'conf', 'local', 'private' }
+        return vim.iter(disable_patterns):all(function(pattern)
+          return not string.match(fname, pattern)
+        end)
+      end,
+    },
+  })
+
+  local hl = vim.api.nvim_get_hl(0, { name = 'Comment' })
+  vim.api.nvim_set_hl(0, 'CopilotSuggestion', vim.tbl_extend('force', hl, { underline = true }))
+end)
+
