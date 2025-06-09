@@ -56,3 +56,4 @@ alias dclf='docker compose logs -f'
 # 開発用エイリアス
 alias nv='nvim'
 alias vc='code'
+alias lg='LazyGit'
