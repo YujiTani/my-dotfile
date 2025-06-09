@@ -191,3 +191,11 @@ nvim2/
 ```
 
 各ファイルを編集して、設定をカスタマイズできます。
+
+性能チェックに、vim-startuptime を使うと起動速度測定ができます
+```
+# install
+go install github.com/rhysd/vim-startuptime@latest
+# 実行
+vim-startuptime -vimpath nvim
+```
