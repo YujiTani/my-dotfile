@@ -426,8 +426,26 @@ end)(vim.treesitter.start)
   ---@diagnostic disable-next-line: missing-fields
   require('nvim-treesitter.configs').setup({
     -- auto-install parsers
-    ensure_installed = { 'lua', 'vim', 'tsx' },
+    ensure_installed = { 'lua', 'vim', 'tsx', 'nginx' },
     highlight = { enable = true },
+  })
+
+  -- nginx ファイルタイプ検出
+  vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+    pattern = {
+      'nginx.conf',
+      '*.nginx',
+      'sites-available/*',
+      'sites-enabled/*',
+      '/etc/nginx/*',
+      '/usr/local/nginx/conf/*',
+      '*/nginx/*.conf',
+    },
+    callback = function()
+      vim.bo.filetype = 'nginx'
+      -- nginx用の追加設定
+      vim.bo.iskeyword = vim.bo.iskeyword .. ',$'
+    end,
   })
 end)
 
