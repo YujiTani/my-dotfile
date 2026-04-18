@@ -28,10 +28,11 @@ return {
     config = function()
       require("mason-lspconfig").setup({
         ensure_installed = {
-          "ts_ls", -- TypeScript
+          "tsserver", -- TypeScript
           "eslint", -- ESLint
           "solargraph", -- Ruby
           "lua_ls", -- Lua
+          "jdtls", -- Java
         },
         automatic_installation = true,
       })
@@ -47,13 +48,13 @@ return {
       "hrsh7th/cmp-nvim-lsp", -- LSPソースを補完に連携
     },
     config = function()
-      -- LSPの動作設定
-      local lspconfig = require("lspconfig")
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
+      -- 全サーバー共通のcapabilities設定
+      vim.lsp.config("*", { capabilities = capabilities })
+
       -- TypeScript
-      lspconfig.ts_ls.setup({
-        capabilities = capabilities,
+      vim.lsp.config("ts_ls", {
         settings = {
           typescript = {
             inlayHints = {
@@ -80,14 +81,8 @@ return {
         },
       })
 
-      -- ESLint
-      lspconfig.eslint.setup({
-        capabilities = capabilities,
-      })
-
       -- Ruby (Solargraph)
-      lspconfig.solargraph.setup({
-        capabilities = capabilities,
+      vim.lsp.config("solargraph", {
         settings = {
           solargraph = {
             diagnostics = true,
@@ -95,9 +90,8 @@ return {
         },
       })
 
-      -- lua_ls の設定部分を修正
-      lspconfig.lua_ls.setup({
-        capabilities = capabilities,
+      -- Lua
+      vim.lsp.config("lua_ls", {
         settings = {
           Lua = {
             diagnostics = {
@@ -114,28 +108,67 @@ return {
         },
       })
 
+      -- Java (jdtls)
+      -- JDKのパス確認方法: ターミナルで `/usr/libexec/java_home -V` を実行
+      -- 例: /Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home
+      vim.lsp.config("jdtls", {
+        settings = {
+          java = {
+            configuration = {
+              runtimes = {
+                {
+                  name = "JavaSE-21",
+                  path = "/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home",
+                  default = true, -- デフォルトで使用するJDK
+                },
+                {
+                  name = "JavaSE-25",
+                  path = "/Users/yuzunosk/Library/Java/JavaVirtualMachines/openjdk-25/Contents/Home",
+                },
+              },
+            },
+            eclipse = { downloadSources = true },
+            maven = { downloadSources = true },
+            implementationsCodeLens = { enabled = true },
+            referencesCodeLens = { enabled = true },
+            inlayHints = { parameterNames = { enabled = "all" } },
+          },
+        },
+      })
+
+      vim.lsp.enable({ "ts_ls", "eslint", "solargraph", "lua_ls", "jdtls" })
+
       -- LSPキーマッピング（共通）
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("UserLspConfig", {}),
         callback = function(ev)
-          local opts = { buffer = ev.buf }
-          vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
-          vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-          vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-          vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
-          vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, opts)
-          vim.keymap.set("n", "<leader>wa", vim.lsp.buf.add_workspace_folder, opts)
-          vim.keymap.set("n", "<leader>wr", vim.lsp.buf.remove_workspace_folder, opts)
-          vim.keymap.set("n", "<leader>wl", function()
+          local base_opts = { buffer = ev.buf }
+          local function map(mode, lhs, rhs, desc)
+            vim.keymap.set(mode, lhs, rhs, vim.tbl_extend("force", base_opts, { desc = desc }))
+          end
+
+          map("n", "gD", vim.lsp.buf.declaration, "宣言へジャンプ")
+          map("n", "gd", vim.lsp.buf.definition, "定義へジャンプ")
+          map("n", "K", vim.lsp.buf.hover, "カーソル位置の情報を表示")
+          map("n", "gi", vim.lsp.buf.implementation, "実装へジャンプ")
+          map("n", "<C-k>", vim.lsp.buf.signature_help, "関数シグネチャを表示")
+          map("n", "<leader>wa", vim.lsp.buf.add_workspace_folder, "ワークスペースにフォルダを追加")
+          map(
+            "n",
+            "<leader>wr",
+            vim.lsp.buf.remove_workspace_folder,
+            "ワークスペースからフォルダを削除"
+          )
+          map("n", "<leader>wl", function()
             print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-          end, opts)
-          vim.keymap.set("n", "<leader>D", vim.lsp.buf.type_definition, opts)
-          vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-          vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts)
-          vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-          vim.keymap.set("n", "<leader>f", function()
+          end, "ワークスペースフォルダ一覧を表示")
+          map("n", "<leader>D", vim.lsp.buf.type_definition, "型定義へジャンプ")
+          map("n", "<leader>rn", vim.lsp.buf.rename, "シンボル名を変更")
+          map({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, "コードアクションを表示")
+          map("n", "gr", vim.lsp.buf.references, "参照箇所を検索")
+          map("n", "<leader>f", function()
             vim.lsp.buf.format({ async = true })
-          end, opts)
+          end, "フォーマッターで整形")
         end,
       })
     end,
@@ -164,12 +197,12 @@ return {
       })
 
       -- LSPSagaのキーマッピング
-      vim.keymap.set("n", "<leader>lf", "<cmd>Lspsaga finder<CR>")
-      vim.keymap.set("n", "<leader>la", "<cmd>Lspsaga code_action<CR>")
-      vim.keymap.set("n", "<leader>lr", "<cmd>Lspsaga rename<CR>")
-      vim.keymap.set("n", "<leader>ld", "<cmd>Lspsaga peek_definition<CR>")
-      vim.keymap.set("n", "<leader>lo", "<cmd>Lspsaga outline<CR>")
-      vim.keymap.set("n", "K", "<cmd>Lspsaga hover_doc<CR>")
+      vim.keymap.set("n", "<leader>lf", "<cmd>Lspsaga finder<CR>", { desc = "定義/参照/実装を統合表示" })
+      vim.keymap.set("n", "<leader>la", "<cmd>Lspsaga code_action<CR>", { desc = "LSPSagaのコードアクション" })
+      vim.keymap.set("n", "<leader>lr", "<cmd>Lspsaga rename<CR>", { desc = "LSPSagaでリネーム" })
+      vim.keymap.set("n", "<leader>ld", "<cmd>Lspsaga peek_definition<CR>", { desc = "定義をプレビュー表示" })
+      vim.keymap.set("n", "<leader>lo", "<cmd>Lspsaga outline<CR>", { desc = "アウトラインを表示" })
+      vim.keymap.set("n", "K", "<cmd>Lspsaga hover_doc<CR>", { desc = "ホバードキュメントを表示" })
     end,
   },
 }
